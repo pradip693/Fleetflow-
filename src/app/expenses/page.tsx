@@ -37,7 +37,7 @@ import { Pagination } from "@/components/ui/pagination";
 import {
   Plus,
   Fuel,
-  DollarSign,
+  IndianRupee,
   Receipt,
   Droplets,
   Pencil,
@@ -256,7 +256,7 @@ export default function ExpensesPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-              <DollarSign className="h-4 w-4 text-green-500" />
+              <IndianRupee className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(stats.totalExpenses)}</div>
@@ -301,11 +301,11 @@ export default function ExpensesPage() {
             filterType !== "all" ||
             filterDateFrom ||
             filterDateTo) && (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              <X className="mr-2 h-4 w-4" />
-              Clear
-            </Button>
-          )}
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                <X className="mr-2 h-4 w-4" />
+                Clear
+              </Button>
+            )}
         </div>
         {showFilters && (
           <Card>
@@ -592,7 +592,7 @@ export default function ExpensesPage() {
             )}
 
             <div className="space-y-2">
-              <Label>Cost ($) *</Label>
+              <Label>Cost (₹) *</Label>
               <Input
                 type="number"
                 min="0"

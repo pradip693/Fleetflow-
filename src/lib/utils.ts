@@ -16,8 +16,19 @@ export async function api<T>(endpoint: string, options?: RequestInit): Promise<T
   return res.json();
 }
 
+export const USD_TO_INR = 83;
+
+export function convertUSDToINR(amount: number): number {
+  return amount * USD_TO_INR;
+}
+
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+  const inrAmount = convertUSDToINR(amount);
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(inrAmount);
 }
 
 export function formatDate(date: string): string {

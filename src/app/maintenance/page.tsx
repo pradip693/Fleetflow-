@@ -26,7 +26,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Maintenance, MaintenanceStatus } from "@/types";
 import {
   Plus, Search, MoreHorizontal, Wrench, CheckCircle2, Clock, Calendar,
-  DollarSign, Pencil,
+  IndianRupee, Pencil,
 } from "lucide-react";
 
 const STATUS_BADGE_MAP: Record<MaintenanceStatus, "warning" | "success" | "info"> = {
@@ -234,7 +234,7 @@ export default function MaintenancePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="flex items-center gap-3 p-4">
-              <DollarSign className="h-8 w-8 text-emerald-600" />
+              <IndianRupee className="h-8 w-8 text-emerald-600" />
               <div>
                 <p className="text-2xl font-bold">{formatCurrency(totalCost)}</p>
                 <p className="text-xs text-muted-foreground">Total Cost</p>
@@ -489,7 +489,7 @@ export default function MaintenancePage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>Cost ($) *</Label>
+                <Label>Cost (₹) *</Label>
                 <Input
                   type="number"
                   placeholder="0.00"

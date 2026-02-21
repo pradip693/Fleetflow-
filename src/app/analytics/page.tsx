@@ -19,7 +19,7 @@ import {
   Download,
   Activity,
   Shield,
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   Truck,
   Users,
@@ -292,9 +292,9 @@ export default function AnalyticsPage() {
         <p className="text-sm font-medium mb-1">{label}</p>
         {payload.map((entry, i) => (
           <p key={i} className="text-xs" style={{ color: entry.color }}>
-            {entry.name}: {typeof entry.value === "number" && entry.name.includes("$")
+            {entry.name}: {typeof entry.value === "number" && (entry.name.includes("Cost") || entry.name.includes("Revenue") || entry.name.includes("Profit"))
               ? formatCurrency(entry.value)
-              : formatNumber(entry.value)}
+              : formatNumber(entry.value as number)}
           </p>
         ))}
       </div>
@@ -357,14 +357,14 @@ export default function AnalyticsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Revenue (Est.)</CardTitle>
-              <DollarSign className="h-4 w-4 text-green-500" />
+              <IndianRupee className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {formatCurrency(metrics.totalRevenue)}
               </div>
               <p className="text-xs text-muted-foreground">
-                ${CARGO_RATE_PER_KG}/kg on {trips.filter((t) => t.status === "Completed").length} completed trips
+                ₹{CARGO_RATE_PER_KG}/kg on {trips.filter((t) => t.status === "Completed").length} completed trips
               </p>
             </CardContent>
           </Card>
@@ -439,7 +439,7 @@ export default function AnalyticsPage() {
                     <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 12 }} />
                     <YAxis className="text-xs" tick={{ fontSize: 12 }} />
                     <Tooltip
-                      formatter={(value: number) => [formatCurrency(value), "Fuel Cost"]}
+                      formatter={(value: any) => [formatCurrency(value), "Fuel Cost"]}
                       contentStyle={{
                         borderRadius: "8px",
                         border: "1px solid hsl(var(--border))",
@@ -476,7 +476,7 @@ export default function AnalyticsPage() {
                       tick={{ fontSize: 12 }}
                     />
                     <Tooltip
-                      formatter={(value: number) => [`${value}`, "Safety Score"]}
+                      formatter={(value: any) => [`${value}`, "Safety Score"]}
                       contentStyle={{
                         borderRadius: "8px",
                         border: "1px solid hsl(var(--border))",
@@ -553,7 +553,7 @@ export default function AnalyticsPage() {
                     <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip
-                      formatter={(value: number, name: string) => [
+                      formatter={(value: any, name: string) => [
                         formatCurrency(value),
                         name,
                       ]}
@@ -600,7 +600,7 @@ export default function AnalyticsPage() {
                     <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip
-                      formatter={(value: number) => [`${value} km/L`, "Efficiency"]}
+                      formatter={(value: any) => [`${value} km/L`, "Efficiency"]}
                       contentStyle={{
                         borderRadius: "8px",
                         border: "1px solid hsl(var(--border))",
@@ -635,7 +635,7 @@ export default function AnalyticsPage() {
               <div>
                 <CardTitle className="text-base">Vehicle ROI Analysis</CardTitle>
                 <CardDescription>
-                  Revenue estimated at ${CARGO_RATE_PER_KG}/kg of cargo on completed trips
+                  Revenue estimated at ₹{CARGO_RATE_PER_KG}/kg of cargo on completed trips
                 </CardDescription>
               </div>
               <Button variant="outline" size="sm" onClick={exportCSV}>
