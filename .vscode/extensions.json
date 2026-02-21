@@ -1,8 +1,0 @@
-{
-  "recommendations": [
-    "dbaeumer.vscode-eslint", // Enforces your rules
-    "esbenp.prettier-vscode", // Enforces your style
-    "bradlc.vscode-tailwindcss", // Tailwind Autocomplete (Vital for v4)
-    "usernamehw.errorlens" // ⚡ Shows errors in RED text next to the line
-  ]
-}
