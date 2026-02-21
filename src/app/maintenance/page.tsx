@@ -25,9 +25,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Maintenance, MaintenanceStatus } from "@/types";
 import {
-  Plus, Search, MoreHorizontal, Wrench, CheckCircle2, Clock, Calendar,
-  IndianRupee, Pencil,
+  Plus, Search, MoreHorizontal, Wrench, CheckCircle2, IndianRupee, Pencil,
 } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
+import { parseISO, format } from "date-fns";
 
 const STATUS_BADGE_MAP: Record<MaintenanceStatus, "warning" | "success" | "info"> = {
   "In Progress": "warning",
@@ -243,7 +244,7 @@ export default function MaintenancePage() {
           </Card>
           <Card>
             <CardContent className="flex items-center gap-3 p-4">
-              <Calendar className="h-8 w-8 text-blue-600" />
+              <span className="text-2xl h-8 w-8 text-blue-600 flex items-center justify-center font-bold">#</span>
               <div>
                 <p className="text-2xl font-bold">{statusCounts["Scheduled"] ?? 0}</p>
                 <p className="text-xs text-muted-foreground">Scheduled</p>
@@ -499,10 +500,9 @@ export default function MaintenancePage() {
               </div>
               <div className="grid gap-2">
                 <Label>Date *</Label>
-                <Input
-                  type="date"
-                  value={form.date}
-                  onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                <DatePicker
+                  date={form.date ? parseISO(form.date) : undefined}
+                  setDate={(d) => setForm((f) => ({ ...f, date: d ? format(d, "yyyy-MM-dd") : "" }))}
                 />
               </div>
             </div>
@@ -519,10 +519,9 @@ export default function MaintenancePage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Next Due Date</Label>
-                <Input
-                  type="date"
-                  value={form.nextDueDate}
-                  onChange={(e) => setForm((f) => ({ ...f, nextDueDate: e.target.value }))}
+                <DatePicker
+                  date={form.nextDueDate ? parseISO(form.nextDueDate) : undefined}
+                  setDate={(d) => setForm((f) => ({ ...f, nextDueDate: d ? format(d, "yyyy-MM-dd") : "" }))}
                 />
               </div>
               <div className="grid gap-2">

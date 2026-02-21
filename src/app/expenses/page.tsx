@@ -48,6 +48,8 @@ import {
 } from "lucide-react";
 import { formatCurrency, formatDate, formatNumber } from "@/lib/utils";
 import type { Expense, ExpenseType } from "@/types";
+import { DatePicker } from "@/components/ui/date-picker";
+import { parseISO, format } from "date-fns";
 
 const EXPENSE_TYPES: ExpenseType[] = ["Fuel", "Toll", "Parking", "Other"];
 
@@ -345,18 +347,16 @@ export default function ExpensesPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Date From</Label>
-                  <Input
-                    type="date"
-                    value={filterDateFrom}
-                    onChange={(e) => setFilterDateFrom(e.target.value)}
+                  <DatePicker
+                    date={filterDateFrom ? parseISO(filterDateFrom) : undefined}
+                    setDate={(d) => setFilterDateFrom(d ? format(d, "yyyy-MM-dd") : "")}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Date To</Label>
-                  <Input
-                    type="date"
-                    value={filterDateTo}
-                    onChange={(e) => setFilterDateTo(e.target.value)}
+                  <DatePicker
+                    date={filterDateTo ? parseISO(filterDateTo) : undefined}
+                    setDate={(d) => setFilterDateTo(d ? format(d, "yyyy-MM-dd") : "")}
                   />
                 </div>
               </div>
@@ -605,12 +605,11 @@ export default function ExpensesPage() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 flex flex-col">
               <Label>Date *</Label>
-              <Input
-                type="date"
-                value={form.date}
-                onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+              <DatePicker
+                date={form.date ? parseISO(form.date) : undefined}
+                setDate={(d) => setForm((f) => ({ ...f, date: d ? format(d, "yyyy-MM-dd") : "" }))}
               />
             </div>
 

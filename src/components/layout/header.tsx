@@ -52,6 +52,8 @@ interface HeaderProps {
   actions?: React.ReactNode;
 }
 
+import { ThemeToggle } from "./theme-toggle";
+
 export function Header({ title, description, actions }: HeaderProps) {
   const router = useRouter();
   const { user, logout } = useAuthStore();
@@ -182,6 +184,7 @@ export function Header({ title, description, actions }: HeaderProps) {
       </div>
       <div className="flex items-center gap-3">
         {actions}
+        <ThemeToggle />
 
         <Sheet>
           <SheetTrigger asChild>
