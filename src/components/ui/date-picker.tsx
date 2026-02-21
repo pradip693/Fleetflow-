@@ -21,8 +21,10 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ date, setDate, placeholder = "Pick a date", className }: DatePickerProps) {
+    const [open, setOpen] = React.useState(false);
+
     return (
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
                     variant={"outline"}
@@ -40,7 +42,10 @@ export function DatePicker({ date, setDate, placeholder = "Pick a date", classNa
                 <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
+                    onSelect={(d) => {
+                        setDate(d);
+                        setOpen(false);
+                    }}
                     initialFocus
                 />
                 <Separator />
@@ -49,7 +54,10 @@ export function DatePicker({ date, setDate, placeholder = "Pick a date", classNa
                         variant="ghost"
                         size="sm"
                         className="text-xs h-8"
-                        onClick={() => setDate(new Date())}
+                        onClick={() => {
+                            setDate(new Date());
+                            setOpen(false);
+                        }}
                     >
                         Today
                     </Button>
@@ -58,7 +66,10 @@ export function DatePicker({ date, setDate, placeholder = "Pick a date", classNa
                             variant="ghost"
                             size="sm"
                             className="text-xs h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                            onClick={() => setDate(undefined)}
+                            onClick={() => {
+                                setDate(undefined);
+                                setOpen(false);
+                            }}
                         >
                             Clear
                         </Button>

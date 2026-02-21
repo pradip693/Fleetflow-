@@ -53,7 +53,7 @@ import type { Vehicle, Driver, Trip, Maintenance, Expense } from "@/types";
 const PIE_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#6b7280"];
 const VEHICLE_STATUS_COLORS: Record<string, string> = {
     Available: "#10b981",
-    Active: "#3b82f6",
+    "On Trip": "#6366f1",
     "In Shop": "#f59e0b",
     "Out of Service": "#ef4444",
 };
@@ -319,58 +319,71 @@ export function AnalyticsClient({ initialData }: AnalyticsClientProps) {
 
             <div className="flex-1 overflow-auto p-6 space-y-6">
                 {/* KPI Cards */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <Card className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Revenue (Est.)</CardTitle>
-                            <IndianRupee className="h-4 w-4 text-emerald-500" />
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <Card className="glass-card border-none shadow-xl shadow-indigo-500/5 overflow-hidden group">
+                        <div className="h-1 w-full bg-emerald-500 opacity-50" />
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <CardTitle className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Total Revenue (Est.)</CardTitle>
+                            <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                                <IndianRupee className="h-4 w-4 text-emerald-600" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-3xl font-black tracking-tighter">
                                 {formatCurrency(metrics.totalRevenue)}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                                ₹{CARGO_RATE_PER_KG}/kg on {activeTrips.filter((t) => t.status === "Completed").length} completed trips
+                            <p className="text-[11px] font-bold text-emerald-600/80 mt-1 flex items-center gap-1">
+                                <TrendingUp className="h-3 w-3" />
+                                {activeTrips.filter((t) => t.status === "Completed").length} trips completed
                             </p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Operational Cost</CardTitle>
-                            <TrendingUp className="h-4 w-4 text-orange-500" />
+                    <Card className="glass-card border-none shadow-xl shadow-indigo-500/5 overflow-hidden group">
+                        <div className="h-1 w-full bg-orange-500 opacity-50" />
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <CardTitle className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Operational Cost</CardTitle>
+                            <div className="h-8 w-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                                <TrendingUp className="h-4 w-4 text-orange-600" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-3xl font-black tracking-tighter">
                                 {formatCurrency(metrics.totalOperationalCost)}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">Fuel + Maintenance</p>
+                            <p className="text-[11px] font-bold text-muted-foreground mt-1 uppercase tracking-tighter">Fuel + Maintenance</p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Net Profit Margin</CardTitle>
-                            <Activity className="h-4 w-4 text-blue-500" />
+                    <Card className="glass-card border-none shadow-xl shadow-indigo-500/5 overflow-hidden group">
+                        <div className="h-1 w-full bg-indigo-500 opacity-50" />
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <CardTitle className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Net Profit</CardTitle>
+                            <div className="h-8 w-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                                <Activity className="h-4 w-4 text-indigo-600" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-3xl font-black tracking-tighter gradient-text">
                                 {formatCurrency(metrics.profit)}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                                {((metrics.profit / (metrics.totalRevenue || 1)) * 100).toFixed(1)}% average margin
+                            <p className="text-[11px] font-bold text-indigo-600 mt-1 uppercase tracking-tighter">
+                                {((metrics.profit / (metrics.totalRevenue || 1)) * 100).toFixed(1)}% Net Margin
                             </p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Safety Index</CardTitle>
-                            <Shield className="h-4 w-4 text-purple-500" />
+                    <Card className="glass-card border-none shadow-xl shadow-indigo-500/5 overflow-hidden group">
+                        <div className="h-1 w-full bg-purple-500 opacity-50" />
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <CardTitle className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Safety Index</CardTitle>
+                            <div className="h-8 w-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                <Shield className="h-4 w-4 text-purple-600" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-3xl font-black tracking-tighter">
                                 {metrics.avgSafety.toFixed(1)}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                                Across {activeDrivers.length} drivers
+                            <p className="text-[11px] font-bold text-muted-foreground mt-1 uppercase tracking-tighter">
+                                Fleet Safety Average
                             </p>
                         </CardContent>
                     </Card>
@@ -378,26 +391,24 @@ export function AnalyticsClient({ initialData }: AnalyticsClientProps) {
 
                 {/* Charts Grid */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <Card className="lg:col-span-1 border-slate-200/60 dark:border-slate-800/60 shadow-sm">
-                        <CardHeader>
-                            <CardTitle className="text-base font-semibold">Vehicle Status Distribution</CardTitle>
-                            <CardDescription>Real-time fleet availability overview</CardDescription>
+                    <Card className="lg:col-span-1 border-none shadow-xl shadow-indigo-500/5 glass-card overflow-hidden">
+                        <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                            <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vehicle Status Distribution</CardTitle>
+                            <CardDescription className="text-[10px] font-medium text-slate-400 uppercase mt-0.5">Real-time fleet availability overview</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <div className="h-[280px]">
+                        <CardContent className="pt-0">
+                            <div className="h-[280px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
                                             data={vehicleStatusData}
                                             cx="50%"
                                             cy="50%"
-                                            innerRadius={60}
-                                            outerRadius={100}
-                                            paddingAngle={4}
+                                            innerRadius={65}
+                                            outerRadius={85}
+                                            paddingAngle={8}
                                             dataKey="value"
-                                            label={({ name, percent }: any) =>
-                                                `${name ?? ""} (${((percent ?? 0) * 100).toFixed(0)}%)`
-                                            }
+                                            stroke="none"
                                         >
                                             {vehicleStatusData.map((entry) => (
                                                 <Cell
@@ -407,17 +418,28 @@ export function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                                             ))}
                                         </Pie>
                                         <Tooltip content={<CustomTooltip />} />
-                                        <Legend verticalAlign="bottom" height={36} />
+                                        <Legend
+                                            verticalAlign="bottom"
+                                            height={36}
+                                            iconType="circle"
+                                            wrapperStyle={{
+                                                fontSize: '10px',
+                                                fontWeight: '900',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.1em',
+                                                paddingTop: '10px'
+                                            }}
+                                        />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="lg:col-span-2 border-slate-200/60 dark:border-slate-800/60 shadow-sm">
-                        <CardHeader>
-                            <CardTitle className="text-base font-semibold">Monthly Fuel Consumption</CardTitle>
-                            <CardDescription>Fuel cost trends and seasonal variations (₹)</CardDescription>
+                    <Card className="lg:col-span-2 border-none shadow-xl shadow-indigo-500/5 glass-card overflow-hidden">
+                        <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                            <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Monthly Fuel Consumption</CardTitle>
+                            <CardDescription className="text-[10px] font-medium text-slate-400 uppercase mt-0.5">Fuel cost trends and seasonal variations (₹)</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="h-[280px]">
@@ -430,8 +452,8 @@ export function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-800" vertical={false} />
-                                        <XAxis dataKey="month" className="text-[10px]" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                                        <YAxis className="text-[10px]" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v / 1000}k`} />
+                                        <XAxis dataKey="month" className="text-[10px]" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+                                        <YAxis className="text-[10px]" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v / 1000}k`} />
                                         <Tooltip content={<CustomTooltip />} />
                                         <Area type="monotone" dataKey="cost" name="Fuel Cost" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorCost)" />
                                     </AreaChart>
@@ -440,10 +462,10 @@ export function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                         </CardContent>
                     </Card>
 
-                    <Card className="lg:col-span-1 border-slate-200/60 dark:border-slate-800/60 shadow-sm">
-                        <CardHeader>
-                            <CardTitle className="text-base font-semibold">Driver Performance Index</CardTitle>
-                            <CardDescription>Top ranked drivers by safety score</CardDescription>
+                    <Card className="lg:col-span-1 border-none shadow-xl shadow-indigo-500/5 glass-card overflow-hidden">
+                        <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                            <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Driver Performance Index</CardTitle>
+                            <CardDescription className="text-[10px] font-medium text-slate-400 uppercase mt-0.5">Top ranked drivers by safety score</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="h-[280px]">
@@ -451,7 +473,7 @@ export function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                                     <BarChart data={driverSafetyData} layout="vertical">
                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} className="stroke-slate-200 dark:stroke-slate-800" />
                                         <XAxis type="number" hide />
-                                        <YAxis dataKey="name" type="category" className="text-[10px]" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} width={60} axisLine={false} tickLine={false} />
+                                        <YAxis dataKey="name" type="category" className="text-[10px]" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={60} axisLine={false} tickLine={false} />
                                         <Tooltip cursor={{ fill: 'transparent' }} content={<CustomTooltip />} />
                                         <Bar dataKey="score" name="Safety Score" radius={[0, 4, 4, 0]} barSize={20} />
                                     </BarChart>
@@ -460,10 +482,10 @@ export function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                         </CardContent>
                     </Card>
 
-                    <Card className="lg:col-span-1 border-slate-200/60 dark:border-slate-800/60 shadow-sm">
-                        <CardHeader>
-                            <CardTitle className="text-base font-semibold">Asset Utilization</CardTitle>
-                            <CardDescription>Trip status breakdown across tasks</CardDescription>
+                    <Card className="lg:col-span-1 border-none shadow-xl shadow-indigo-500/5 glass-card overflow-hidden">
+                        <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                            <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Asset Utilization</CardTitle>
+                            <CardDescription className="text-[10px] font-medium text-slate-400 uppercase mt-0.5">Trip status breakdown across tasks</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="h-[280px]">
@@ -496,10 +518,10 @@ export function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                         </CardContent>
                     </Card>
 
-                    <Card className="lg:col-span-1 border-slate-200/60 dark:border-slate-800/60 shadow-sm">
-                        <CardHeader>
-                            <CardTitle className="text-base font-semibold">Strategic Cost Analysis</CardTitle>
-                            <CardDescription>Top 5 cost-intensive vehicles (₹)</CardDescription>
+                    <Card className="lg:col-span-1 border-none shadow-xl shadow-indigo-500/5 glass-card overflow-hidden">
+                        <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                            <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Strategic Cost Analysis</CardTitle>
+                            <CardDescription className="text-[10px] font-medium text-slate-400 uppercase mt-0.5">Top 5 cost-intensive vehicles (₹)</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="h-[280px]">
@@ -520,12 +542,12 @@ export function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                 </div>
 
                 {/* Vehicle ROI Section */}
-                <Card className="border-slate-200/60 dark:border-slate-800/60 shadow-sm overflow-hidden">
-                    <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-200/60 dark:border-slate-800/60">
+                <Card className="border-none shadow-xl shadow-indigo-500/5 glass-card overflow-hidden">
+                    <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 py-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-base font-bold">Vehicle ROI Analysis</CardTitle>
-                                <CardDescription>
+                                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vehicle ROI Analysis</CardTitle>
+                                <CardDescription className="text-[10px] font-medium text-slate-400 uppercase mt-0.5">
                                     Strategic profitability analysis per asset (₹)
                                 </CardDescription>
                             </div>

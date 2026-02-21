@@ -23,14 +23,14 @@ function Calendar({
                 month: "space-y-4",
                 month_caption: "flex justify-center relative items-center h-9",
                 caption_label: "text-sm font-semibold",
-                nav: "flex items-center",
+                nav: "flex items-center justify-between absolute left-2 right-2 top-2 z-10",
                 button_previous: cn(
                     buttonVariants({ variant: "ghost" }),
-                    "h-8 w-8 bg-transparent p-0 opacity-70 hover:opacity-100 absolute left-1 top-1/2 -translate-y-1/2 transition-all hover:bg-accent border border-transparent hover:border-input"
+                    "h-7 w-7 bg-transparent p-0 opacity-70 hover:opacity-100 transition-all hover:bg-accent border border-transparent hover:border-input"
                 ),
                 button_next: cn(
                     buttonVariants({ variant: "ghost" }),
-                    "h-8 w-8 bg-transparent p-0 opacity-70 hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 transition-all hover:bg-accent border border-transparent hover:border-input"
+                    "h-7 w-7 bg-transparent p-0 opacity-70 hover:opacity-100 transition-all hover:bg-accent border border-transparent hover:border-input"
                 ),
                 month_grid: "w-full border-collapse space-y-1",
                 weekdays: "flex justify-between",

@@ -3,8 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useFleetStore } from "@/store/fleet-store";
 import { Header } from "@/components/layout/header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
     Select,
     SelectContent,
@@ -12,38 +10,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { formatDate, formatNumber } from "@/lib/utils";
-import {
-    Truck,
-    Wrench,
-    Gauge,
-    PackageOpen,
-    TrendingUp,
-    TrendingDown,
-    ArrowRight,
-} from "lucide-react";
-import {
-    PieChart,
-    Pie,
-    Cell,
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Legend,
-} from "recharts";
+import { Truck, Wrench, Gauge, PackageOpen } from "lucide-react";
 import type { Vehicle, Driver, Trip, Maintenance, Expense, VehicleStatus, TripStatus } from "@/types";
+
+// Extracted Components
+import { DashboardKPIs } from "./dashboard-kpis";
+import { DashboardCharts } from "./dashboard-charts";
+import { RecentTripsTable } from "./recent-trips-table";
+import { DashboardQuickStats } from "./dashboard-quick-stats";
 
 const STATUS_VARIANT: Record<VehicleStatus, "success" | "info" | "warning" | "destructive"> = {
     Available: "success",
@@ -59,7 +33,12 @@ const TRIP_STATUS_VARIANT: Record<TripStatus, "success" | "info" | "warning" | "
     Cancelled: "destructive",
 };
 
-const PIE_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444"];
+const VEHICLE_STATUS_COLORS: Record<string, string> = {
+    Available: "#10b981",
+    "On Trip": "#6366f1",
+    "In Shop": "#f59e0b",
+    "Out of Service": "#ef4444",
+};
 
 interface DashboardClientProps {
     initialData: {
@@ -80,7 +59,6 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         expenses: storeExpenses,
     } = useFleetStore();
 
-    // Hydrate store on mount
     useEffect(() => {
         useFleetStore.setState({
             vehicles: initialData.vehicles,
@@ -92,12 +70,10 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         });
     }, [initialData]);
 
-    // Use store data if available, otherwise initialData
     const vehicles = storeVehicles.length ? storeVehicles : initialData.vehicles;
     const drivers = storeDrivers.length ? storeDrivers : initialData.drivers;
     const trips = storeTrips.length ? storeTrips : initialData.trips;
     const maintenance = storeMaintenance.length ? storeMaintenance : initialData.maintenance;
-    const expenses = storeExpenses.length ? storeExpenses : initialData.expenses;
 
     const [typeFilter, setTypeFilter] = useState<string>("all");
     const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -129,11 +105,18 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
     const pendingCargoCount = trips.filter((t) => t.status === "Draft").length;
 
     const statusDistribution = useMemo(() => {
-        const counts: Record<string, number> = {};
+        const counts: Record<string, number> = {
+            "Available": 0,
+            "On Trip": 0,
+            "In Shop": 0,
+            "Out of Service": 0
+        };
         filteredVehicles.forEach((v) => {
             counts[v.status] = (counts[v.status] || 0) + 1;
         });
-        return Object.entries(counts).map(([name, value]) => ({ name, value }));
+        return Object.entries(counts)
+            .filter(([_, value]) => value > 0)
+            .map(([name, value]) => ({ name, value }));
     }, [filteredVehicles]);
 
     const typeDistribution = useMemo(() => {
@@ -154,31 +137,29 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
             .slice(0, 5);
     }, [trips]);
 
-    const completedTripsCount = trips.filter((t) => t.status === "Completed").length;
-
-    const kpiCards = [
+    const kpis = [
         {
             label: "Active Fleet",
             value: activeFleetCount,
             icon: Truck,
             trend: `${filteredVehicles.length} total`,
             trendUp: activeFleetCount > 0,
-            color: "text-blue-600 bg-blue-100 dark:bg-blue-900/40 dark:text-blue-400",
+            color: "text-indigo-600 bg-indigo-100 dark:bg-indigo-900/40 dark:text-indigo-400",
         },
         {
-            label: "Maintenance Alerts",
+            label: "In Repair",
             value: maintenanceAlertsCount,
             icon: Wrench,
             trend: `${maintenance.filter((m) => m.status === "In Progress").length} in progress`,
-            trendUp: false,
+            trendUp: maintenanceAlertsCount === 0,
             color: "text-amber-600 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-400",
         },
         {
-            label: "Utilization Rate",
+            label: "Utilization",
             value: `${utilization}%`,
             icon: Gauge,
-            trend: `${completedTripsCount} trips completed`,
-            trendUp: utilization > 50,
+            trend: `${trips.filter(t => t.status === "Completed").length} trips done`,
+            trendUp: utilization > 60,
             color: "text-emerald-600 bg-emerald-100 dark:bg-emerald-900/40 dark:text-emerald-400",
         },
         {
@@ -198,20 +179,20 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
         drivers.find((d) => d.id === id)?.name ?? `#${id}`;
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col min-h-full bg-slate-50/30 dark:bg-transparent">
             <Header
                 title="Command Center"
-                description="Fleet overview at a glance"
+                description="Fleet operations and real-time logistics overview"
             />
 
-            <div className="flex-1 space-y-6 p-6">
+            <div className="flex-1 space-y-8 p-6">
                 {/* Filters */}
                 <div className="flex flex-wrap items-center gap-3">
                     <Select value={typeFilter} onValueChange={setTypeFilter}>
-                        <SelectTrigger className="w-[160px]">
+                        <SelectTrigger className="w-[160px] rounded-xl border-slate-200 dark:border-slate-800">
                             <SelectValue placeholder="Vehicle Type" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-xl">
                             <SelectItem value="all">All Types</SelectItem>
                             <SelectItem value="Truck">Truck</SelectItem>
                             <SelectItem value="Van">Van</SelectItem>
@@ -220,10 +201,10 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                     </Select>
 
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[170px]">
+                        <SelectTrigger className="w-[170px] rounded-xl border-slate-200 dark:border-slate-800">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-xl">
                             <SelectItem value="all">All Statuses</SelectItem>
                             <SelectItem value="Available">Available</SelectItem>
                             <SelectItem value="On Trip">On Trip</SelectItem>
@@ -233,10 +214,10 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                     </Select>
 
                     <Select value={regionFilter} onValueChange={setRegionFilter}>
-                        <SelectTrigger className="w-[160px]">
+                        <SelectTrigger className="w-[160px] rounded-xl border-slate-200 dark:border-slate-800">
                             <SelectValue placeholder="Region" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-xl">
                             <SelectItem value="all">All Regions</SelectItem>
                             {regions.map((r) => (
                                 <SelectItem key={r} value={r}>
@@ -247,201 +228,26 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
                     </Select>
                 </div>
 
-                {/* KPI Cards */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {kpiCards.map((kpi) => (
-                        <Card key={kpi.label}>
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">
-                                    {kpi.label}
-                                </CardTitle>
-                                <div className={`rounded-lg p-2 ${kpi.color}`}>
-                                    <kpi.icon className="h-4 w-4" />
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{kpi.value}</div>
-                                <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                                    {kpi.trendUp ? (
-                                        <TrendingUp className="h-3 w-3 text-emerald-500" />
-                                    ) : (
-                                        <TrendingDown className="h-3 w-3 text-amber-500" />
-                                    )}
-                                    {kpi.trend}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                <DashboardKPIs kpis={kpis} />
 
-                {/* Charts & Table */}
-                <div className="grid gap-6 lg:grid-cols-5">
-                    {/* Status Distribution Pie */}
-                    <Card className="lg:col-span-2">
-                        <CardHeader>
-                            <CardTitle className="text-base">Vehicle Status Distribution</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {statusDistribution.length > 0 ? (
-                                <ResponsiveContainer width="100%" height={260}>
-                                    <PieChart>
-                                        <Pie
-                                            data={statusDistribution}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={55}
-                                            outerRadius={90}
-                                            paddingAngle={4}
-                                            dataKey="value"
-                                            nameKey="name"
-                                            label={({ name, value }) => `${name}: ${value}`}
-                                        >
-                                            {statusDistribution.map((entry, i) => (
-                                                <Cell
-                                                    key={entry.name}
-                                                    fill={
-                                                        PIE_COLORS[
-                                                        Object.keys(STATUS_VARIANT).indexOf(entry.name as VehicleStatus) % PIE_COLORS.length
-                                                        ]
-                                                    }
-                                                />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
-                                    No vehicles match the current filters
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                <DashboardCharts
+                    statusDistribution={statusDistribution}
+                    typeDistribution={typeDistribution}
+                    statusColors={VEHICLE_STATUS_COLORS}
+                />
 
-                    {/* Type Breakdown Bar Chart */}
-                    <Card className="lg:col-span-3">
-                        <CardHeader>
-                            <CardTitle className="text-base">Fleet by Type &amp; Status</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {typeDistribution.length > 0 ? (
-                                <ResponsiveContainer width="100%" height={260}>
-                                    <BarChart data={typeDistribution}>
-                                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                                        <XAxis dataKey="type" className="text-xs" />
-                                        <YAxis allowDecimals={false} className="text-xs" />
-                                        <Tooltip />
-                                        <Legend />
-                                        <Bar dataKey="Available" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-                                        <Bar dataKey="On Trip" stackId="a" fill="#3b82f6" />
-                                        <Bar dataKey="In Shop" stackId="a" fill="#f59e0b" />
-                                        <Bar dataKey="Out of Service" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
-                                    No vehicles match the current filters
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
+                <RecentTripsTable
+                    trips={recentTrips}
+                    getVehicleName={getVehicleName}
+                    getDriverName={getDriverName}
+                    statusVariants={TRIP_STATUS_VARIANT}
+                />
 
-                {/* Recent Trips Table */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-base">Recent Trips</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Trip</TableHead>
-                                    <TableHead>Vehicle</TableHead>
-                                    <TableHead>Driver</TableHead>
-                                    <TableHead className="hidden md:table-cell">Route</TableHead>
-                                    <TableHead className="hidden sm:table-cell">Cargo (kg)</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="hidden lg:table-cell">Created</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {recentTrips.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                                            No trips found
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    recentTrips.map((trip) => (
-                                        <TableRow key={trip.id}>
-                                            <TableCell className="font-medium">#{trip.id}</TableCell>
-                                            <TableCell>{getVehicleName(trip.vehicleId)}</TableCell>
-                                            <TableCell>{getDriverName(trip.driverId)}</TableCell>
-                                            <TableCell className="hidden max-w-[240px] truncate md:table-cell">
-                                                <span className="flex items-center gap-1">
-                                                    <span className="truncate">{trip.origin}</span>
-                                                    <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground" />
-                                                    <span className="truncate">{trip.destination}</span>
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="hidden sm:table-cell">
-                                                {formatNumber(trip.cargoWeight)}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant={TRIP_STATUS_VARIANT[trip.status]}>
-                                                    {trip.status}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="hidden lg:table-cell">
-                                                {formatDate(trip.createdAt)}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
-
-                {/* Quick Stats Footer */}
-                <div className="grid gap-4 sm:grid-cols-3">
-                    <Card>
-                        <CardContent className="flex items-center gap-4 p-4">
-                            <div className="rounded-lg bg-blue-100 p-2.5 dark:bg-blue-900/40">
-                                <Truck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Total Vehicles</p>
-                                <p className="text-xl font-bold">{vehicles.length}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardContent className="flex items-center gap-4 p-4">
-                            <div className="rounded-lg bg-emerald-100 p-2.5 dark:bg-emerald-900/40">
-                                <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Total Trips</p>
-                                <p className="text-xl font-bold">{trips.length}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardContent className="flex items-center gap-4 p-4">
-                            <div className="rounded-lg bg-purple-100 p-2.5 dark:bg-purple-900/40">
-                                <Gauge className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Active Drivers</p>
-                                <p className="text-xl font-bold">
-                                    {drivers.filter((d) => d.status === "On Duty").length}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                <DashboardQuickStats
+                    totalVehicles={vehicles.length}
+                    totalTrips={trips.length}
+                    activeDrivers={drivers.filter((d) => d.status === "On Duty").length}
+                />
             </div>
         </div>
     );

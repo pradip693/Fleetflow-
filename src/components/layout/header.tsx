@@ -177,14 +177,14 @@ export function Header({ title, description, actions }: HeaderProps) {
   };
 
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-background px-6">
-      <div>
-        <h1 className="text-lg font-semibold">{title}</h1>
-        {description && <p className="text-sm text-muted-foreground">{description}</p>}
+    <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between border-b bg-background px-6 shadow-sm transition-colors">
+      <div className="flex flex-col">
+        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50 uppercase tracking-wide text-sm font-black md:text-xl md:normal-case md:font-bold">{title}</h1>
+        {description && <p className="text-sm text-muted-foreground/80 font-medium">{description}</p>}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         {actions}
-        <ThemeToggle />
+        {/* <ThemeToggle /> */}
 
         <Sheet>
           <SheetTrigger asChild>

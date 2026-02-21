@@ -69,7 +69,7 @@ export function Sidebar() {
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          "flex h-screen flex-col border-r bg-sidebar transition-all duration-300 shrink-0",
+          "flex h-screen flex-col border-r sidebar-gradient transition-all duration-300 shrink-0 shadow-sm z-50",
           collapsed ? "w-16" : "w-[260px]"
         )}
       >
@@ -97,7 +97,7 @@ export function Sidebar() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shrink-0">
                 <Shield className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="text-lg font-bold tracking-tight">FleetFlow</span>
+              <span className="text-lg font-bold tracking-tight gradient-text">FleetFlow</span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -124,12 +124,20 @@ export function Sidebar() {
                     ? "h-10 w-full justify-center"
                     : "gap-3 px-3 py-2",
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-sidebar-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-sidebar-foreground hover:bg-accent/50 hover:text-accent-foreground"
                 )}
               >
-                <item.icon className="h-[18px] w-[18px] shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
+                <div className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-md transition-colors",
+                  isActive ? "bg-white/10" : "bg-transparent"
+                )}>
+                  <item.icon className="h-[18px] w-[18px] shrink-0" />
+                </div>
+                {!collapsed && <span className="flex-1">{item.label}</span>}
+                {!collapsed && isActive && (
+                  <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                )}
               </Link>
             );
 

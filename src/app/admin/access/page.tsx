@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -26,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Pagination } from "@/components/ui/pagination";
 import {
-  Plus, Search, MoreHorizontal, Pencil, Trash2, Shield, ShieldCheck,
+  Search, MoreHorizontal, Pencil, Trash2, Shield, ShieldCheck,
   CheckCircle2, XCircle, LayoutDashboard, Truck, Route, Wrench,
   Receipt, Users, BarChart3, Eye, EyeOff, UserPlus, KeyRound,
 } from "lucide-react";
@@ -238,214 +237,230 @@ export default function AccessControlPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full bg-slate-50/30 dark:bg-transparent">
       <Header
         title="Access Control"
         description="Manage users, roles, and module permissions"
         actions={
-          <Button size="sm" onClick={openCreate}>
+          <Button onClick={openCreate} size="sm" className="rounded-xl shadow-lg shadow-indigo-500/20">
             <UserPlus className="mr-2 h-4 w-4" />
             Add User
           </Button>
         }
       />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 space-y-6 p-6">
         <Tabs defaultValue="users">
-          <TabsList>
-            <TabsTrigger value="users">User Management</TabsTrigger>
-            <TabsTrigger value="roles">Role Permissions</TabsTrigger>
+          <TabsList className="bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-1 rounded-xl h-11">
+            <TabsTrigger value="users" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm px-6 font-bold text-xs uppercase tracking-widest transition-all">User Management</TabsTrigger>
+            <TabsTrigger value="roles" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm px-6 font-bold text-xs uppercase tracking-widest transition-all">Role Permissions</TabsTrigger>
           </TabsList>
 
           {/* ======================== TAB 1: USER MANAGEMENT ======================== */}
-          <TabsContent value="users" className="space-y-4 mt-4">
+          <TabsContent value="users" className="space-y-6 mt-6">
             {/* Role summary cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {ALL_ROLES.map((role) => (
-                <Card key={role.value} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setRoleFilter(roleFilter === role.value ? "all" : role.value)}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold", role.color)}>
+                <Card
+                  key={role.value}
+                  className={cn(
+                    "glass-card border-none shadow-xl shadow-indigo-500/5 cursor-pointer hover:shadow-indigo-500/10 transition-all",
+                    roleFilter === role.value && "ring-2 ring-indigo-500/50"
+                  )}
+                  onClick={() => setRoleFilter(roleFilter === role.value ? "all" : role.value)}
+                >
+                  <CardContent className="p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest", role.color)}>
                         <Shield className="h-3 w-3" />
                         {role.label}
                       </div>
-                      <span className="text-2xl font-bold">{roleCounts[role.value] ?? 0}</span>
+                      <span className="text-2xl font-black tracking-tighter">{roleCounts[role.value] ?? 0}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">{role.description}</p>
-                    {roleFilter === role.value && (
-                      <Badge variant="secondary" className="mt-2 text-[10px]">Filtered</Badge>
-                    )}
+                    <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight">{role.description}</p>
                   </CardContent>
                 </Card>
               ))}
             </div>
 
             {/* Search + filters */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative flex-1 min-w-[220px] max-w-sm">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="relative flex-1 min-w-[260px] max-w-sm">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search by name or email..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9"
+                  className="pl-10 rounded-xl border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-indigo-500/20 transition-all font-bold shadow-sm"
                 />
               </div>
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="All Roles" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Roles</SelectItem>
-                  {ALL_ROLES.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="ml-auto text-sm text-muted-foreground">
-                {totalFiltered} of {users.length} users
+
+              <div className="flex items-center gap-3">
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="w-[180px] rounded-xl border-slate-200 dark:border-slate-800 font-bold shadow-sm">
+                    <SelectValue placeholder="All Roles" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="all" className="font-bold">All Roles</SelectItem>
+                    {ALL_ROLES.map((r) => (
+                      <SelectItem key={r.value} value={r.value} className="font-bold">{r.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="ml-auto flex items-center gap-3">
+                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 bg-slate-100 dark:bg-slate-800/50 px-4 py-2 rounded-xl flex items-center gap-2 border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
+                  <Users className="h-3 w-3" />
+                  <span className="text-slate-900 dark:text-slate-100">{totalFiltered}</span>
+                  <span className="opacity-50">of</span>
+                  <span className="text-slate-900 dark:text-slate-100">{users.length} users</span>
+                </div>
               </div>
             </div>
 
             {/* Users table */}
-            <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Permissions</TableHead>
-                    <TableHead className="w-[80px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedUsers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
-                        {isLoading ? "Loading..." : "No users found."}
-                      </TableCell>
+            <Card className="glass-card border-none shadow-xl shadow-indigo-500/5 overflow-hidden">
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent border-slate-100 dark:border-slate-800">
+                      <TableHead className="font-bold uppercase text-[10px] tracking-widest pl-6">Operator Identity</TableHead>
+                      <TableHead className="font-bold uppercase text-[10px] tracking-widest">Email Channel</TableHead>
+                      <TableHead className="font-bold uppercase text-[10px] tracking-widest text-center">Clearance</TableHead>
+                      <TableHead className="font-bold uppercase text-[10px] tracking-widest">Auth Vector</TableHead>
+                      <TableHead className="w-[80px] pr-6 font-bold uppercase text-[10px] tracking-widest text-right">Actions</TableHead>
                     </TableRow>
-                  ) : (
-                    paginatedUsers.map((u) => {
-                      const roleConf = getRoleConfig(u.role);
-                      const perms = ROLE_PERMISSIONS[u.role];
-                      const isSelf = u.id === currentUser?.id;
-                      return (
-                        <TableRow key={u.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <Avatar className="h-9 w-9">
-                                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                                  {getInitials(u.name)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <p className="font-medium">
-                                  {u.name}
-                                  {isSelf && <span className="ml-1.5 text-xs text-muted-foreground">(You)</span>}
-                                </p>
-                                <p className="text-xs text-muted-foreground">ID: {u.id}</p>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedUsers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                          {isLoading ? "Loading..." : "No users found."}
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      paginatedUsers.map((u) => {
+                        const roleConf = getRoleConfig(u.role);
+                        const perms = ROLE_PERMISSIONS[u.role];
+                        const isSelf = u.id === currentUser?.id;
+                        return (
+                          <TableRow key={u.id} className="border-slate-100 dark:border-slate-800">
+                            <TableCell className="pl-6">
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-10 w-10 ring-2 ring-slate-100 dark:ring-slate-800 shadow-sm">
+                                  <AvatarFallback className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-tighter">
+                                    {getInitials(u.name)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-black text-xs uppercase tracking-tight text-slate-700 dark:text-slate-200">
+                                    {u.name}
+                                    {isSelf && <span className="ml-2 py-0.5 px-1.5 rounded-md bg-indigo-500 text-white text-[9px] font-black uppercase tracking-widest">You</span>}
+                                  </p>
+                                  <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">ID #FF-{u.id.toString().padStart(4, "0")}</p>
+                                </div>
                               </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-sm">{u.email}</TableCell>
-                          <TableCell>
-                            <Select
-                              value={u.role}
-                              onValueChange={(v) => handleRoleChange(u.id, v as UserRole)}
-                              disabled={isSelf}
-                            >
-                              <SelectTrigger className={cn("h-8 w-[180px] text-xs font-semibold border-0", roleConf.color)}>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {ALL_ROLES.map((r) => (
-                                  <SelectItem key={r.value} value={r.value}>
-                                    <div className="flex items-center gap-2">
-                                      <Shield className="h-3 w-3" />
-                                      {r.label}
-                                    </div>
-                                  </SelectItem>
+                            </TableCell>
+                            <TableCell className="text-[11px] font-bold text-slate-600 dark:text-slate-400">{u.email}</TableCell>
+                            <TableCell className="text-center">
+                              <Select
+                                value={u.role}
+                                onValueChange={(v) => handleRoleChange(u.id, v as UserRole)}
+                                disabled={isSelf}
+                              >
+                                <SelectTrigger className={cn("h-7 w-[160px] mx-auto text-[9px] font-black uppercase tracking-widest border-0 rounded-full pr-8", roleConf.color)}>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl">
+                                  {ALL_ROLES.map((r) => (
+                                    <SelectItem key={r.value} value={r.value} className="rounded-lg font-bold">
+                                      <div className="flex items-center gap-2">
+                                        <Shield className="h-3 w-3" />
+                                        {r.label}
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap gap-1">
+                                {perms.slice(0, 4).map((p) => (
+                                  <Badge key={p} variant="secondary" className="text-[9px] font-black uppercase tracking-tight px-1.5 py-0 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-0">
+                                    {MODULES.find((m) => m.key === p)?.label ?? p}
+                                  </Badge>
                                 ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-wrap gap-1">
-                              {perms.map((p) => (
-                                <Badge key={p} variant="secondary" className="text-[10px] px-1.5 py-0">
-                                  {MODULES.find((m) => m.key === p)?.label ?? p}
-                                </Badge>
-                              ))}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => openEdit(u)}>
-                                  <Pencil className="mr-2 h-4 w-4" />
-                                  Edit User
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => openResetPw(u)}>
-                                  <KeyRound className="mr-2 h-4 w-4" />
-                                  Reset Password
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  onClick={() => confirmDelete(u)}
-                                  disabled={isSelf}
-                                  className={cn(!isSelf && "text-destructive focus:text-destructive")}
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Delete User
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-              <Pagination
-                totalItems={totalFiltered}
-                pageSize={pageSize}
-                currentPage={page}
-                onPageChange={setPage}
-                onPageSizeChange={setPageSize}
-              />
+                                {perms.length > 4 && (
+                                  <Badge variant="secondary" className="text-[9px] font-black uppercase tracking-tight px-1.5 py-0 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border-0">
+                                    +{perms.length - 4} MORE
+                                  </Badge>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="pr-6 text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                                    <MoreHorizontal className="h-4 w-4 text-slate-400" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="rounded-xl border-slate-200 dark:border-slate-800 shadow-2xl p-2 min-w-[180px]">
+                                  <DropdownMenuItem onClick={() => openEdit(u)} className="rounded-lg cursor-pointer font-bold text-xs">
+                                    <Pencil className="mr-2 h-3.5 w-3.5" />
+                                    Edit Operator
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => openResetPw(u)} className="rounded-lg cursor-pointer font-bold text-xs">
+                                    <KeyRound className="mr-2 h-3.5 w-3.5" />
+                                    Security Override
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator className="my-2" />
+                                  <DropdownMenuItem
+                                    onClick={() => confirmDelete(u)}
+                                    disabled={isSelf}
+                                    className={cn("rounded-lg cursor-pointer font-black text-xs uppercase tracking-widest", !isSelf && "text-destructive focus:text-destructive focus:bg-destructive/10")}
+                                  >
+                                    <Trash2 className="mr-2 h-3.5 w-3.5" />
+                                    Revoke Access
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+                <Pagination
+                  totalItems={totalFiltered}
+                  pageSize={pageSize}
+                  currentPage={page}
+                  onPageChange={setPage}
+                  onPageSizeChange={setPageSize}
+                />
+              </CardContent>
             </Card>
           </TabsContent>
 
           {/* ======================== TAB 2: ROLE PERMISSIONS ======================== */}
-          <TabsContent value="roles" className="space-y-6 mt-4">
-            {/* Permission Matrix */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShieldCheck className="h-5 w-5" />
-                  Role-Permission Matrix
+          <TabsContent value="roles" className="space-y-6 mt-6">
+            <Card className="glass-card border-none shadow-xl shadow-indigo-500/5 overflow-hidden">
+              <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 py-4">
+                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4" />
+                  Service Matrix
                 </CardTitle>
-                <CardDescription>
-                  Overview of which modules each role can access. Roles are defined by the system.
-                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[200px] sticky left-0 bg-background">Module</TableHead>
+                      <TableRow className="hover:bg-transparent border-slate-100 dark:border-slate-800">
+                        <TableHead className="w-[240px] sticky left-0 bg-background p-4 font-bold uppercase text-[10px] tracking-widest pl-8">Service Module</TableHead>
                         {ALL_ROLES.map((r) => (
-                          <TableHead key={r.value} className="text-center min-w-[140px]">
-                            <div className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold", r.color)}>
+                          <TableHead key={r.value} className="text-center min-w-[140px] font-bold uppercase text-[10px] tracking-widest px-4">
+                            <div className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-black tracking-widest border border-black/5 dark:border-white/5", r.color)}>
                               <Shield className="h-3 w-3" />
                               {r.label}
                             </div>
@@ -455,13 +470,16 @@ export default function AccessControlPage() {
                     </TableHeader>
                     <TableBody>
                       {MODULES.map((mod) => (
-                        <TableRow key={mod.key}>
-                          <TableCell className="sticky left-0 bg-background">
-                            <div className="flex items-center gap-2.5">
-                              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
-                                <mod.icon className="h-4 w-4 text-muted-foreground" />
+                        <TableRow key={mod.key} className="border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors">
+                          <TableCell className="sticky left-0 bg-background/95 backdrop-blur-sm pl-8">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50">
+                                <mod.icon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                               </div>
-                              <span className="font-medium text-sm">{mod.label}</span>
+                              <div>
+                                <p className="font-black text-[11px] uppercase tracking-tight text-slate-700 dark:text-slate-200">{mod.label}</p>
+                                <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-50">Component Module</p>
+                              </div>
                             </div>
                           </TableCell>
                           {ALL_ROLES.map((role) => {
@@ -469,12 +487,12 @@ export default function AccessControlPage() {
                             return (
                               <TableCell key={role.value} className="text-center">
                                 {hasAccess ? (
-                                  <div className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40">
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                  <div className="inline-flex items-center justify-center p-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50">
+                                    <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shadow-sm shadow-emerald-500/10" />
                                   </div>
                                 ) : (
-                                  <div className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-muted">
-                                    <XCircle className="h-4 w-4 text-muted-foreground/40" />
+                                  <div className="inline-flex items-center justify-center p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+                                    <XCircle className="h-4 w-4 text-slate-300 dark:text-slate-700" />
                                   </div>
                                 )}
                               </TableCell>
@@ -489,40 +507,39 @@ export default function AccessControlPage() {
             </Card>
 
             {/* Role detail cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               {ALL_ROLES.map((role) => {
                 const perms = ROLE_PERMISSIONS[role.value];
                 const count = roleCounts[role.value] ?? 0;
                 return (
-                  <Card key={role.value}>
-                    <CardHeader className="pb-3">
+                  <Card key={role.value} className="glass-card border-none shadow-xl shadow-indigo-500/5">
+                    <CardHeader className="pb-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-900/20">
                       <div className="flex items-center justify-between">
-                        <div className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold", role.color)}>
+                        <div className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-widest", role.color)}>
                           <Shield className="h-3.5 w-3.5" />
                           {role.label}
                         </div>
-                        <Badge variant="secondary">{count} user{count !== 1 ? "s" : ""}</Badge>
+                        <Badge variant="secondary" className="rounded-full px-3 py-1 bg-slate-100 dark:bg-slate-800 text-[10px] font-black border-0">{count} Operators</Badge>
                       </div>
-                      <CardDescription className="pt-1">{role.description}</CardDescription>
+                      <CardDescription className="pt-2 text-[11px] font-bold uppercase tracking-tight opacity-70">{role.description}</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-xs font-medium text-muted-foreground mb-2">
-                        Accessible Modules ({perms.length} of {MODULES.length})
-                      </p>
-                      <div className="space-y-1.5">
+                    <CardContent className="pt-6">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4"> Authorized Access Vector </p>
+                      <div className="grid grid-cols-2 gap-2">
                         {MODULES.map((mod) => {
                           const has = perms.includes(mod.key);
                           return (
                             <div
                               key={mod.key}
                               className={cn(
-                                "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm",
-                                has ? "bg-emerald-50 dark:bg-emerald-950/20" : "opacity-40"
+                                "flex items-center gap-3 rounded-xl px-3 py-2 text-[10px] font-bold transition-all border",
+                                has
+                                  ? "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/30 text-emerald-700 dark:text-emerald-400"
+                                  : "bg-slate-50/50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800/50 text-slate-400 dark:text-slate-600 opacity-60"
                               )}
                             >
-                              <mod.icon className={cn("h-3.5 w-3.5", has ? "text-emerald-600" : "text-muted-foreground")} />
-                              <span className={cn(has ? "font-medium" : "line-through text-muted-foreground")}>{mod.label}</span>
-                              {has && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 ml-auto" />}
+                              <mod.icon className={cn("h-3.5 w-3.5", has ? "text-emerald-500" : "text-muted-foreground")} />
+                              <span className="uppercase tracking-tight">{mod.label}</span>
                             </div>
                           );
                         })}
@@ -535,157 +552,6 @@ export default function AccessControlPage() {
           </TabsContent>
         </Tabs>
       </div>
-
-      {/* ======================== ADD / EDIT USER DIALOG ======================== */}
-      <Dialog open={dialogOpen} onOpenChange={(open) => { if (!open) setDialogOpen(false); }}>
-        <DialogContent className="sm:max-w-[480px]">
-          <DialogHeader>
-            <DialogTitle>{editingUser ? "Edit User" : "Create New User"}</DialogTitle>
-            <DialogDescription>
-              {editingUser
-                ? "Update user details and role assignment."
-                : "Add a new user to the system with a role."}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid gap-4 py-2">
-            {formError && (
-              <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
-                {formError}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label>Full Name *</Label>
-              <Input
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="John Doe"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Email *</Label>
-              <Input
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                placeholder="user@fleetflow.com"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>{editingUser ? "New Password (leave blank to keep)" : "Password *"}</Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  placeholder={editingUser ? "Leave blank to keep current" : "Min. 6 characters"}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Role *</Label>
-              <Select value={form.role} onValueChange={(v) => setForm((f) => ({ ...f, role: v as UserRole }))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {ALL_ROLES.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-3.5 w-3.5" />
-                        <span>{r.label}</span>
-                        <span className="text-xs text-muted-foreground ml-1">— {r.description}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Separator />
-
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-2">This role will have access to:</p>
-              <div className="flex flex-wrap gap-1.5">
-                {ROLE_PERMISSIONS[form.role].map((p) => (
-                  <Badge key={p} variant="success" className="text-[10px]">
-                    {MODULES.find((m) => m.key === p)?.label ?? p}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={saving}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? "Saving..." : editingUser ? "Save Changes" : "Create User"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ======================== DELETE DIALOG ======================== */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete{" "}
-              <span className="font-semibold text-foreground">{userToDelete?.name}</span>{" "}
-              ({userToDelete?.email})? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
-              {deleting ? "Deleting..." : "Delete User"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ======================== RESET PASSWORD DIALOG ======================== */}
-      <Dialog open={resetPwDialogOpen} onOpenChange={setResetPwDialogOpen}>
-        <DialogContent className="sm:max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle>Reset Password</DialogTitle>
-            <DialogDescription>
-              Set a new password for <span className="font-semibold text-foreground">{resetPwUser?.name}</span>.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-2">
-            <div className="space-y-2">
-              <Label>New Password</Label>
-              <Input
-                type="text"
-                value={newPw}
-                onChange={(e) => setNewPw(e.target.value)}
-                placeholder="Min. 6 characters"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setResetPwDialogOpen(false)} disabled={resetPwSaving}>Cancel</Button>
-            <Button onClick={handleResetPw} disabled={resetPwSaving || newPw.length < 6}>
-              <KeyRound className="mr-2 h-4 w-4" />
-              {resetPwSaving ? "Resetting..." : "Reset Password"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
